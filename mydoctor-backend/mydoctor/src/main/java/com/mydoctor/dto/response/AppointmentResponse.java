@@ -39,5 +39,9 @@ public class AppointmentResponse {
     private String doctorNotes;
     private String rejectionReason;
 
+    // Payment info
+    private String paymentStatus;
+    private String razorpayPaymentId;
+
     private LocalDateTime createdAt;
 }

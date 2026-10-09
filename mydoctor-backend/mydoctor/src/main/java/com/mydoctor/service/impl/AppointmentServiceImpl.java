@@ -27,7 +27,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final PatientProfileRepository patientProfileRepository;
     private final DoctorProfileRepository doctorProfileRepository;
     private final TimeSlotRepository timeSlotRepository;
-    private final UserRepository userRepository;
 
     // ── Patient Actions ────────────────────────────────────────────────────────
 
@@ -74,6 +73,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .reasonForVisit(request.getReasonForVisit())
                 .symptoms(request.getSymptoms())
                 .patientAddress(request.getPatientAddress())
+                .razorpayOrderId(request.getRazorpayOrderId())
+                .razorpayPaymentId(request.getRazorpayPaymentId())
+                .paymentStatus(request.getRazorpayPaymentId() != null ? "PAID" : "PENDING")
                 .build();
 
         return mapToResponse(appointmentRepository.save(appointment));
@@ -199,8 +201,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Transactional(readOnly = true)
     public AppointmentResponse getAppointmentById(Long userId, Long appointmentId) {
         Appointment appointment = getAppointmentById(appointmentId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         boolean isPatient = appointment.getPatient().getUser().getId().equals(userId);
         boolean isDoctor  = appointment.getDoctor().getUser().getId().equals(userId);
@@ -258,6 +258,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .patientAddress(a.getPatientAddress())
                 .doctorNotes(a.getDoctorNotes())
                 .rejectionReason(a.getRejectionReason())
+                .paymentStatus(a.getPaymentStatus())
+                .razorpayPaymentId(a.getRazorpayPaymentId())
                 .createdAt(a.getCreatedAt());
 
         if (a.getTimeSlot() != null) {

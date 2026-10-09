@@ -60,6 +60,14 @@ public class Appointment {
     @Column(length = 500)
     private String rejectionReason;
 
+    // Payment tracking
+    private String razorpayOrderId;
+
+    private String razorpayPaymentId;
+
+    @Column(length = 20)
+    private String paymentStatus; // CREATED, PAID, FAILED
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;

@@ -32,6 +32,16 @@ public class DoctorProfile {
 
     private String clinicAddress;
 
+    private String medicalLicenseNumber;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean verified = true; // default true for existing seed data
+
+    @Column(length = 20)
+    @Builder.Default
+    private String verificationStatus = "APPROVED"; // PENDING, APPROVED, REJECTED
+
     @Column(nullable = false)
     @Builder.Default
     private Integer consultationFeeClinic = 0;

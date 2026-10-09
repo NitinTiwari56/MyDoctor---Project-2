@@ -61,6 +61,7 @@ public class DoctorServiceImpl implements DoctorService {
     public List<DoctorProfileResponse> getAllDoctors() {
         return doctorProfileRepository.findAll()
                 .stream()
+                .filter(d -> d.getUser() != null && d.getUser().isActive() && d.isVerified())
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -70,6 +71,7 @@ public class DoctorServiceImpl implements DoctorService {
     public List<DoctorProfileResponse> searchDoctors(String keyword) {
         return doctorProfileRepository.searchDoctors(keyword)
                 .stream()
+                .filter(d -> d.getUser() != null && d.getUser().isActive() && d.isVerified())
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -79,6 +81,7 @@ public class DoctorServiceImpl implements DoctorService {
     public List<DoctorProfileResponse> getDoctorsBySpecialization(String specialization) {
         return doctorProfileRepository.findBySpecializationContainingIgnoreCase(specialization)
                 .stream()
+                .filter(d -> d.getUser() != null && d.getUser().isActive() && d.isVerified())
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -131,6 +134,9 @@ public class DoctorServiceImpl implements DoctorService {
                 .experienceYears(p.getExperienceYears())
                 .acceptsHomeVisits(p.isAcceptsHomeVisits())
                 .profilePictureUrl(p.getProfilePictureUrl())
+                .medicalLicenseNumber(p.getMedicalLicenseNumber())
+                .verified(p.isVerified())
+                .verificationStatus(p.getVerificationStatus() != null ? p.getVerificationStatus() : (p.isVerified() ? "APPROVED" : "PENDING"))
                 .build();
     }
 }

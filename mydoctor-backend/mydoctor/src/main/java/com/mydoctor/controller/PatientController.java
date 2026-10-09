@@ -1,11 +1,15 @@
 package com.mydoctor.controller;
 
+import com.mydoctor.dto.request.ChatMessageRequest;
 import com.mydoctor.dto.request.UpdatePatientProfileRequest;
 import com.mydoctor.dto.response.ApiResponse;
+import com.mydoctor.dto.response.ChatbotResponse;
 import com.mydoctor.dto.response.DashboardResponse;
 import com.mydoctor.dto.response.PatientProfileResponse;
 import com.mydoctor.security.UserDetailsImpl;
+import com.mydoctor.service.ChatbotService;
 import com.mydoctor.service.PatientService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class PatientController {
 
     private final PatientService patientService;
+    private final ChatbotService chatbotService;
 
     /**
      * GET /api/patient/profile
@@ -57,5 +62,19 @@ public class PatientController {
         return ResponseEntity.ok(
                 ApiResponse.success("Dashboard fetched",
                         patientService.getDashboard(currentUser.getId())));
+    }
+
+    /**
+     * POST /api/patient/chatbot/message
+     * PATIENT: send message to Spring AI healthcare assistant for symptom triage & appointment reminders
+     */
+    @PostMapping("/chatbot/message")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<ApiResponse<ChatbotResponse>> sendChatbotMessage(
+            @AuthenticationPrincipal UserDetailsImpl currentUser,
+            @Valid @RequestBody ChatMessageRequest request) {
+        return ResponseEntity.ok(
+                ApiResponse.success("AI response generated",
+                        chatbotService.processPatientMessage(currentUser.getId(), request)));
     }
 }

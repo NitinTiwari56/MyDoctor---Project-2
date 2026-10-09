@@ -22,4 +22,9 @@ public class BookAppointmentRequest {
 
     // Required for HOME_VISIT
     private String patientAddress;
+
+    // Razorpay payment details
+    private String razorpayOrderId;
+
+    private String razorpayPaymentId;
 }

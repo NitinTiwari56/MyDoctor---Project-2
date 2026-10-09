@@ -20,4 +20,7 @@ public class DoctorProfileResponse {
     private Double experienceYears;
     private boolean acceptsHomeVisits;
     private String profilePictureUrl;
+    private String medicalLicenseNumber;
+    private boolean verified;
+    private String verificationStatus;
 }

@@ -1,0 +1,35 @@
+# ── Backend (Maven / Spring Boot) ──────────────────────────
+mydoctor-backend/mydoctor/target/
+mydoctor-backend/mydoctor/*.jar
+mydoctor-backend/mydoctor/*.war
+
+# ── Frontend (React / Node) ───────────────────────────────
+mydoctor-frontend/mydoctor-frontend/node_modules/
+mydoctor-frontend/mydoctor-frontend/build/
+mydoctor-frontend/mydoctor-frontend/.env.local
+mydoctor-frontend/mydoctor-frontend/.env.production
+
+# ── IDE Files ─────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+*.swp
+*.swo
+
+# ── OS Files ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Environment / Secrets ─────────────────────────────────
+.env
+*.env
+application-local.properties
+application-prod.properties
+
+# ── Logs ──────────────────────────────────────────────────
+*.log
+logs/

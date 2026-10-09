@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getDoctorProfile, updateDoctorProfile } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { Home, MapPin, Award } from 'lucide-react';
+import { Home, MapPin, Award, Save, CheckCircle, Stethoscope, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 export default function DoctorProfile() {
@@ -9,6 +10,7 @@ export default function DoctorProfile() {
   const [form, setForm]     = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving]   = useState(false);
+  const [saved, setSaved]     = useState(false);
 
   useEffect(() => {
     getDoctorProfile()
@@ -22,9 +24,12 @@ export default function DoctorProfile() {
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setSaved(false);
     try {
       await updateDoctorProfile(form);
       toast.success('Profile updated successfully!');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
     } catch {
       toast.error('Could not save profile');
     } finally {
@@ -34,7 +39,7 @@ export default function DoctorProfile() {
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
-      <div className="spinner spinner-dark" />
+      <div className="spinner spinner-dark" style={{ width: 28, height: 28 }} />
     </div>
   );
 
@@ -50,14 +55,28 @@ export default function DoctorProfile() {
       </div>
 
       <div className="page">
-        <div className="card" style={{ maxWidth: 720 }}>
-
+        <motion.div
+          className="card"
+          style={{ maxWidth: 740 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           {/* Header banner */}
           <div className="profile-header">
-            <div className="profile-avatar-lg">{initials}</div>
+            <motion.div
+              className="profile-avatar-lg"
+              whileHover={{ scale: 1.08, rotate: -3 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              {initials}
+            </motion.div>
             <div className="profile-header-info">
               <h2>Dr. {form.fullName}</h2>
-              <p>{form.specialization} · {form.experienceYears} yrs experience</p>
+              <p style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Stethoscope size={14} />
+                {form.specialization} · {form.experienceYears} yrs experience
+              </p>
             </div>
           </div>
 
@@ -65,7 +84,15 @@ export default function DoctorProfile() {
             <form onSubmit={handleSave}>
 
               {/* ── Personal Info ── */}
-              <p style={{ fontSize: '.72rem', fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--gray-400)', marginBottom: 14 }}>
+              <p style={{
+                fontSize: '.72rem', fontWeight: 650, letterSpacing: '.1em',
+                textTransform: 'uppercase', color: 'var(--indigo)',
+                marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <span style={{
+                  width: 4, height: 16, borderRadius: 2,
+                  background: 'var(--grad-primary)', display: 'inline-block',
+                }} />
                 Personal Information
               </p>
               <div className="form-grid">
@@ -82,7 +109,15 @@ export default function DoctorProfile() {
               <div className="divider" />
 
               {/* ── Professional Info ── */}
-              <p style={{ fontSize: '.72rem', fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--gray-400)', marginBottom: 14 }}>
+              <p style={{
+                fontSize: '.72rem', fontWeight: 650, letterSpacing: '.1em',
+                textTransform: 'uppercase', color: 'var(--teal-dark)',
+                marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <span style={{
+                  width: 4, height: 16, borderRadius: 2,
+                  background: 'var(--grad-teal)', display: 'inline-block',
+                }} />
                 Professional Details
               </p>
               <div className="form-grid">
@@ -107,12 +142,20 @@ export default function DoctorProfile() {
               <div className="divider" />
 
               {/* ── Clinic Info ── */}
-              <p style={{ fontSize: '.72rem', fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--gray-400)', marginBottom: 14 }}>
+              <p style={{
+                fontSize: '.72rem', fontWeight: 650, letterSpacing: '.1em',
+                textTransform: 'uppercase', color: 'var(--indigo)',
+                marginBottom: 16, display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <span style={{
+                  width: 4, height: 16, borderRadius: 2,
+                  background: 'var(--grad-primary)', display: 'inline-block',
+                }} />
                 Clinic & Fees
               </p>
               <div className="form-group">
-                <label className="form-label">
-                  <MapPin size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <MapPin size={13} />
                   Clinic Address
                 </label>
                 <input className="form-input" placeholder="123 Main St, City" value={form.clinicAddress || ''} onChange={e => set('clinicAddress', e.target.value)} />
@@ -129,37 +172,112 @@ export default function DoctorProfile() {
               </div>
 
               {/* ── Home Visits toggle ── */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: form.acceptsHomeVisits ? 'var(--teal-pale)' : 'var(--gray-50)', borderRadius: 'var(--radius-sm)', border: `1.5px solid ${form.acceptsHomeVisits ? 'var(--teal)' : 'var(--gray-200)'}`, marginBottom: 18, transition: 'all .2s', cursor: 'pointer' }}
-                onClick={() => set('acceptsHomeVisits', !form.acceptsHomeVisits)}>
-                <Home size={18} color={form.acceptsHomeVisits ? 'var(--teal)' : 'var(--gray-400)'} />
+              <motion.div
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '14px 18px',
+                  background: form.acceptsHomeVisits
+                    ? 'linear-gradient(135deg, rgba(99,102,241,.06), rgba(139,92,246,.04))'
+                    : 'var(--gray-50)',
+                  borderRadius: 10,
+                  border: `1.5px solid ${form.acceptsHomeVisits ? 'rgba(99,102,241,.2)' : 'var(--gray-200)'}`,
+                  marginBottom: 22,
+                  cursor: 'pointer',
+                  transition: 'all .25s',
+                }}
+                onClick={() => set('acceptsHomeVisits', !form.acceptsHomeVisits)}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                <Home size={18} color={form.acceptsHomeVisits ? '#6366f1' : '#94a3b8'} style={{ transition: 'color .2s' }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '.88rem', fontWeight: 500, color: form.acceptsHomeVisits ? 'var(--teal)' : 'var(--gray-700)' }}>Accept Home Visits</div>
-                  <div style={{ fontSize: '.76rem', color: 'var(--gray-400)' }}>Patients can request visits at their location</div>
-                </div>
-                <div style={{ width: 36, height: 20, borderRadius: 99, background: form.acceptsHomeVisits ? 'var(--teal)' : 'var(--gray-300)', position: 'relative', transition: 'background .2s' }}>
-                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, left: form.acceptsHomeVisits ? 18 : 4, transition: 'left .2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
-                </div>
-              </div>
-
-              {/* ── Stats row (read-only) ── */}
-              <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-                {[
-                  { icon: Award, label: 'Email', value: user?.email },
-                ].map(({ icon: Icon, label, value }) => (
-                  <div key={label} style={{ flex: 1, padding: '10px 14px', background: 'var(--gray-50)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--gray-200)' }}>
-                    <div style={{ fontSize: '.68rem', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 3 }}>{label}</div>
-                    <div style={{ fontSize: '.85rem', color: 'var(--gray-700)', fontWeight: 500 }}>{value}</div>
+                  <div style={{
+                    fontSize: '.88rem', fontWeight: 550,
+                    color: form.acceptsHomeVisits ? 'var(--indigo)' : 'var(--gray-700)',
+                    transition: 'color .2s',
+                  }}>
+                    Accept Home Visits
                   </div>
-                ))}
+                  <div style={{ fontSize: '.76rem', color: 'var(--gray-400)' }}>
+                    Patients can request visits at their location
+                  </div>
+                </div>
+                <div style={{
+                  width: 42, height: 24, borderRadius: 99,
+                  background: form.acceptsHomeVisits
+                    ? 'linear-gradient(135deg, #6366f1, #8b5cf6)'
+                    : 'var(--gray-300)',
+                  position: 'relative',
+                  transition: 'background .3s',
+                  boxShadow: form.acceptsHomeVisits ? '0 2px 10px rgba(99,102,241,.3)' : 'none',
+                  flexShrink: 0,
+                }}>
+                  <motion.div
+                    style={{
+                      width: 18, height: 18, borderRadius: '50%',
+                      background: 'white', position: 'absolute',
+                      top: 3,
+                      boxShadow: '0 1px 4px rgba(0,0,0,.2)',
+                    }}
+                    animate={{ left: form.acceptsHomeVisits ? 20 : 4 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                </div>
+              </motion.div>
+
+              {/* ── Email read-only ── */}
+              <div style={{
+                display: 'flex', gap: 12, marginBottom: 22,
+              }}>
+                <div style={{
+                  flex: 1, padding: '12px 16px',
+                  background: 'linear-gradient(135deg, rgba(99,102,241,.04), rgba(139,92,246,.02))',
+                  borderRadius: 10,
+                  border: '1px solid rgba(99,102,241,.08)',
+                }}>
+                  <div style={{
+                    fontSize: '.68rem', color: 'var(--gray-400)',
+                    textTransform: 'uppercase', letterSpacing: '.08em',
+                    marginBottom: 4, fontWeight: 600,
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}>
+                    <Sparkles size={11} />
+                    Email
+                  </div>
+                  <div style={{ fontSize: '.85rem', color: 'var(--gray-700)', fontWeight: 500 }}>
+                    {user?.email}
+                  </div>
+                </div>
               </div>
 
-              <button className="btn btn-primary btn-lg" type="submit" disabled={saving}>
-                {saving ? <span className="spinner" /> : 'Save Changes'}
-              </button>
+              <motion.button
+                className="btn btn-primary btn-lg"
+                type="submit"
+                disabled={saving}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                style={{
+                  background: saved
+                    ? 'linear-gradient(135deg, #10b981, #34d399)'
+                    : undefined,
+                  boxShadow: saved
+                    ? '0 4px 20px rgba(16,185,129,.35)'
+                    : undefined,
+                  transition: 'all .3s',
+                }}
+              >
+                {saving ? (
+                  <span className="spinner" />
+                ) : saved ? (
+                  <><CheckCircle size={17} /> Saved!</>
+                ) : (
+                  <><Save size={17} /> Save Changes</>
+                )}
+              </motion.button>
 
             </form>
           </div>
-        </div>
+        </motion.div>
       </div>
     </>
   );
